@@ -16,8 +16,8 @@ profile:
   #   <p>Your City, State 12345</p>
 
 news: true # includes a list of news items
-selected_papers: true # includes a list of papers marked as "selected={true}"
-social: true # includes social icons at the bottom of the page
+selected_papers: false # includes a list of papers marked as "selected={true}"
+social: false # includes social icons at the bottom of the page
 ---
 
 Hello everyone! I am an incoming PhD student in the [Industrial Engineering and Management Science (IEMS) Department at Northwestern University](https://www.mccormick.northwestern.edu/industrial/). I earned my M.S. in Engineering from the University of Texas at Austin, specializing in Operations Research. I was fortunate to be advised by [Prof. Jonathan F. Bard](https://sites.utexas.edu/bard/) on my master thesis. Prior to that, I completed my bachelor degree from Nankai University. 
