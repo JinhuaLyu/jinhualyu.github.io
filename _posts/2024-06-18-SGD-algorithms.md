@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Stochastic Gradient Descent, SGD with momentum, AdaGrad, RMSProp, and Adam algorithms
+title: The Logic Behind Adam Algorithm
 date: 2024-06-18
 description: A discussion on different stochastic gradient algorithms and why they are efficient
 tags: optimization algorithms
@@ -47,7 +47,9 @@ $$
 \phi'(0) = p_t^T \nabla f(\theta_t)
 $$
 
-So if we choose $p_t = - \nabla f(\theta_t)$, then $p_t^T \nabla f(\theta_t) = - \nabla^2f(\theta_t) < 0$ is a steepest descent direction.
+So if we choose $p_t = - \nabla f(\theta_t)$, then $p_t^T \nabla f(\theta_t) = - \nabla^2f(\theta_t) < 0$ is a steepest descent direction. 
+
+GD is a fundamental algorithm for solving unconstrained optimization problems. However, GD can only guarantee convergence to a local minimum, which may not be the global minimum. If the objective function is convex, we can ensure that it converges to the global minimum.
 
 
 <br />
@@ -64,11 +66,13 @@ $$
 \theta_{t+1} = \theta_t - \alpha \nabla f_{i_t}(\theta)
 $$
 
-$\nabla f_{i_t}(\theta_t)$ represents stochastic gradient instead of the full gradient. Let's illustrate this firstly. Let's use machine learning loss function as an example. Suppose we are trying to minimize the loss function of machine learning: 
+$\nabla f_{i_t}(\theta_t)$ represents stochastic gradient (or sub-gradient) instead of the full gradient. We use sub-gradient instead of the full gradient since the computation cost of full gradient at each iteration is quite large when the number of data points is large in machine learning settings. Suppose we are trying to minimize the loss function of machine learning: 
 
 $$\min_{\theta} \frac{1}{n} \sum_{i=1}^{n} f_i(\theta)$$
 
-n could be super large. So in this case, the full gradient of objective function at $\theta$ is: $\frac{1}{n} \sum_{i=1}^{n} \nabla f_i(\theta)$. The computational cost is large when n is large since we need to calculate the full gradient in every iteration. 
+n could be super large. So in this case, the full gradient of objective function at $\theta$ is: $\frac{1}{n} \sum_{i=1}^{n} \nabla f_i(\theta)$. The computational cost is large when n is large since we need to calculate the full gradient in every iteration.
+
+In stochastic settings, when n is super large, SGD algorithm is a efficient algorithm than the batch gradient algorithm in solving such problems. Here's another paper {% cite bottou2018optimization %} illustrate the reasons behind it clearly. 
 
 <br />
 ### GD with momentum
@@ -92,7 +96,7 @@ In this update rule, $\alpha$ and $\beta$ are hyperparameters. When $\alpha = 1-
 
 <br />
 ### SGD with momentum
-
+Similar to GD with momentum. SGD with momentum also has a comparable update rule. However, an additional advantage of SGD with momentum is that the momentum term captures past sub-gradient information. This consideration helps to mitigate some of the stochastic factors involved in selecting the sub-gradient. [An article](https://towardsdatascience.com/stochastic-gradient-descent-with-momentum-a84097641a5d) explained with examples in why momentum term is critical in SGD algorithm. 
 
 
 <br />
@@ -155,7 +159,7 @@ The primary difference between AdaGrad and RMSProp is that RMSProp uses an expon
 <br />
 ### Adam
 
-Finally, it comes to the Adam algorithm. The update rule is:
+Finally, it comes to the Adam algorithm {% cite kingma2014adam%}. The update rule is:
 
 $$
 t \leftarrow t + 1 \text{ (7a)}
@@ -184,4 +188,6 @@ $$
 $$
 \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} \text{ (7g)}
 $$
+
+Generally, Adam combines the two methods mentioned above to enhance the SGD method. Equations (7c) and (7e) indicate that Adam incorporates the corrected momentum term into its update rule. Equations (7d) and (7f) demonstrate that Adam uses the corrected exponential moving average of the raw second moment of the gradient to adapt the step size. 
 
