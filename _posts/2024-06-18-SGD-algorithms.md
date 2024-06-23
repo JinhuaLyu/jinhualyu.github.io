@@ -189,5 +189,5 @@ $$
 \theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} \text{ (7g)}
 $$
 
-Generally, Adam combines the two methods mentioned above to enhance the SGD method. Equations (7c) and (7e) indicate that Adam incorporates the corrected momentum term into its update rule. Equations (7d) and (7f) demonstrate that Adam uses the corrected exponential moving average of the raw second moment of the gradient to adapt the step size. 
+Generally, Adam combines the two methods mentioned above to enhance the SGD method. Equations (7c) and (7e) indicate that Adam incorporates the corrected momentum term into its update rule. Equations (7d) and (7f) demonstrate that Adam uses the bias-corrected exponential moving average of the raw second moment of the gradient to adapt the step size. 
 
