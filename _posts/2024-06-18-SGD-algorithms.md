@@ -4,7 +4,7 @@ title: Stochastic Gradient Descent, SGD with momentum, AdaGrad, RMSProp, and Ada
 date: 2024-06-18
 description: A discussion on different stochastic gradient algorithms and why they are efficient
 tags: optimization algorithms
-categories: sample-posts
+categories: algorithms
 pseudocode: true
 related_publications: true
 ---
@@ -83,9 +83,9 @@ $$
 \theta_{t+1} = \theta_t + m_t
 $$
 
-Here, $\alpha$ is the step size, or called learning rate. $\beta$ is the momentum parameter. $m_t$ is the modification on $\theta$ at $t$ iteration. The motification of $\theta$ at current iteration depends on both the current gradient and the $\theta$ change at previous iterations. Intuitively, the rationale for the use of the momentum term is that the steepest descent is particularly slow when there is a long and narrow valley in the error function surface. In this situation, the direction of the gradient is almost perpendicular to the long axis of the valley. The system thus oscillates back and forth in the direction of the short axis, and only moves very slowly along the long axis of the valley. The momentum term helps average out the oscillation along the short axis while at the same time adds up contributions along the long axis {% cite rumelhart1986general%}.
+Here, $\alpha$ is the step size, or called learning rate. We will use these two terms interchangeably $\beta$ is the momentum parameter. $m_t$ is the modification on $\theta$ at $t$ iteration. The motification of $\theta$ at current iteration depends on both the current gradient and the $\theta$ change at previous iterations. Intuitively, the rationale for the use of the momentum term is that the steepest descent is particularly slow when there is a long and narrow valley in the error function surface. In this situation, the direction of the gradient is almost perpendicular to the long axis of the valley. The system thus oscillates back and forth in the direction of the short axis, and only moves very slowly along the long axis of the valley. The momentum term helps average out the oscillation along the short axis while at the same time adds up contributions along the long axis {% cite rumelhart1986general%}.
 
-To better understand the intuition behind the momentum term, Rauf Bhat provides a clear illustration in his article on [gradient descent with momentum](https://towardsdatascience.com/gradient-descent-with-momentum-59420f626c8f). 
+To better understand the intuition behind the momentum term, Rauf Bhat provides a clear and simple illustration in his article on [gradient descent with momentum](https://towardsdatascience.com/gradient-descent-with-momentum-59420f626c8f). 
 
 In this update rule, $\alpha$ and $\beta$ are hyperparameters. When $\alpha = 1-\beta$, $m_t$ represents the exponential moving average. Intuitively, we assign a larger weight to the gradient from a more recent iteration. This approach makes sense because gradients are typically more similar when their corresponding points are closer together.
 
@@ -97,11 +97,91 @@ In this update rule, $\alpha$ and $\beta$ are hyperparameters. When $\alpha = 1-
 
 <br />
 ### AdaGrad
+AdaGrad {% cite duchi2011adaptive%} is also a very important algorithm based on SGD. One of the drawbacks of traditional SGD is its reliance on a global step size. Setting this step size is crucial: if it is too large, the algorithm may oscillate across the function and fail to achieve an acceptable loss, whereas if it is too small, it may take an excessively long time to converge to the optimal solution. AdaGrad addresses this issue by using an adaptive step size, allowing the algorithm to adjust the step size dynamically based on the gradients, thereby improving convergence and performance.
+
+The update rule for AdaGrad is:
+
+$$
+g_t = \nabla_{\theta} f(\theta_{t-1})
+$$
+
+$$
+G_t = G_{t-1} + g_t \odot g_t
+$$
+
+$$
+\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{G_t + \epsilon}} \odot g_t
+$$
+
+This update rule is a little bit abstract to understand, so I will change it a little bit. For parameter $\theta^{(1)}$, the first parameter in all parameter vector $\theta$, the update rule is:
+
+$$
+g_t^{(1)} = \nabla_{\theta^{(1)}} f(\theta_{t-1})
+$$
+
+$$
+G_t^{(1)} = G_{t-1}^{(1)} + g_t^{(1)} \odot g_t^{(1)}
+$$
+
+$$
+\theta_t^{(1)} = \theta_{t-1}^{(1)} - \frac{\eta}{\sqrt{G_t^{(1)} + \epsilon}} \odot g_t^{(1)}
+$$
+
+If the parameter $\theta^{(1)}$ is frequently updated, indicating it is far from its optimal value, then $G_t^{(1)}$ becomes larger, leading to a smaller learning rate. Conversely, if the parameter $\theta^{(1)}$ is infrequently updated, suggesting it is close to its optimal value, then $G_t^{(1)}$ remains smaller, resulting in a larger learning rate. The ultimate goal is to reduce the number of iterations needed to reach convergence. [An article discuss AdaGrad](https://medium.com/konvergen/an-introduction-to-adagrad-f130ae871827) vividly, and I use it as a reference. 
+
 
 
 <br />
 ### RMSProp
+ RMSProp also utilizes adaptive gradients and is essentially an extension of AdaGrad. One of the drawbacks of AdaGrad is that the step size consistently decays as the number of iterations increases. Consequently, the algorithm tends to converge slowly in the later iterations, making the final stages of optimization very slow. RMSProp avoids this problem by using the update rule:
+
+$$
+g_t^{(1)} = \nabla_{\theta^{(1)}} f(\theta_{t-1})
+$$
+
+$$
+G_t^{(1)} = \beta G_{t-1}^{(1)} + (1-\beta) g_t^{(1)} \odot g_t^{(1)}
+$$
+
+$$
+\theta_t^{(1)} = \theta_{t-1}^{(1)} - \frac{\eta}{\sqrt{G_t^{(1)} + \epsilon}} \odot g_t^{(1)}
+$$
+
+The primary difference between AdaGrad and RMSProp is that RMSProp uses an exponential moving average of the squared gradients instead of the equally weighted average employed by AdaGrad. This approach places more emphasis on recent gradient values, rather than equally distributing importance among all gradients from the beginning of training.
+
+
 
 
 <br />
 ### Adam
+
+Finally, it comes to the Adam algorithm. The update rule is:
+
+$$
+t \leftarrow t + 1 \text{ (7a)}
+$$
+
+$$
+g_t = \nabla_\theta f_t(\theta_{t-1}) \text{ (7b)}
+$$
+
+$$
+m_t = \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t \text{ (7c)}
+$$
+
+$$
+v_t = \beta_2 \cdot v_{t-1} + (1 - \beta_2) \cdot g_t^2 \text{ (7d)}
+$$
+
+$$
+\hat{m}_t = \frac{m_t}{1 - \beta_1^t} \text{ (7e)}
+$$
+
+$$
+\hat{v}_t = \frac{v_t}{1 - \beta_2^t} \text{ (7f)}
+$$
+
+$$
+\theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} \text{ (7g)}
+$$
+
